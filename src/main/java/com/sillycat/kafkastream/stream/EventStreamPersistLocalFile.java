@@ -37,7 +37,7 @@ public class EventStreamPersistLocalFile {
 		Set<ClickEvent> clicks = new HashSet<>();
 
 		source.foreach((x, y) -> {
-			// log.info("x: " + x + "  y: " + y);
+			log.info("x: " + x + "  y: " + y);
 			ClickEvent click = JSON.parseObject(y.toString(), ClickEvent.class);
 			log.info("parse the string to object: " + click.getName() + " " + click.getContent());
 			clicks.add(click);
