@@ -1,6 +1,8 @@
 package com.sillycat.kafkastream.stream;
 
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.kafka.common.serialization.Serdes;
@@ -9,6 +11,9 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
+
+import com.alibaba.fastjson.JSON;
+import com.sillycat.kafkastream.model.ClickEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,11 +33,18 @@ public class EventStreamPersistLocalFile {
 
 		StreamsBuilder builder = new StreamsBuilder();
 		KStream<Object, Object> source = builder.stream("events_local_file");
+		
+		Set<ClickEvent> clicks = new HashSet<>();
 
 		source.foreach((x, y) -> {
-			log.info("x: " + x + "  y: " + y);
+			// log.info("x: " + x + "  y: " + y);
+			ClickEvent click = JSON.parseObject(y.toString(), ClickEvent.class);
+			log.info("parse the string to object: " + click.getName() + " " + click.getContent());
+			clicks.add(click);
 		});
-
+		
+		log.info("gather all the clicks: " + clicks);
+		
 		final Topology topo = builder.build();
 		final KafkaStreams streams = new KafkaStreams(topo, prop);
 

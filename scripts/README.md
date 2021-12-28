@@ -1,4 +1,4 @@
-
+1640723333977
 Create Topic
 
 ```
@@ -20,6 +20,6 @@ bin/kafka-console-producer.sh --broker-list centos7-master:9092,centos7-worker1:
 Sample JSON events
 
 ```
-{"name":"carl", "age": 39, "action:": "create", "content": "1"， "eventTime": }
+{"name":"carl", "age": 39, "action:": "create", "content": "1"， "eventTime": 1640723333977 }
 ```
 
