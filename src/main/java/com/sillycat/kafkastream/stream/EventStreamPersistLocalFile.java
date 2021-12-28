@@ -27,7 +27,7 @@ public class EventStreamPersistLocalFile {
 		prop.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
 		StreamsBuilder builder = new StreamsBuilder();
-		KStream<Object, Object> source = builder.stream("Events2LocalFile");
+		KStream<Object, Object> source = builder.stream("events_local_file");
 
 		source.foreach((x, y) -> {
 			log.info("x: " + x + "  y: " + y);
