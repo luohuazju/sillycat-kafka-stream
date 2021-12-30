@@ -29,9 +29,14 @@ public class ClickEventConsumeApp {
 		props.put("auto.offset.reset", "earliest"); // earliest, latest, none
 		//session.timeout.ms let group know one consumer is down
 		//max.poll.interval.ms max time we process the logic
-		//fetch.max.bytes size of message we can fetch each time
-		//max.poll.records messages we fetch, default is 500 count
-
+		//props.put("fetch.max.bytes", 32 * 1024 * 1024);//fetch.max.bytes size of message we can fetch each time
+		//props.put("max.poll.records", 20); //max.poll.records messages we fetch, default is 500 count
+		
+		props.put("fetch.max.wait.ms", 6000);
+		props.put("fetch.min.bytes", 32 * 1024 * 1024);
+		//props.put("fetch.max.bytes", 32 * 1024 * 1024);
+		//props.put("max.partition.fetch.bytes", 32 * 1024 * 1024);
+		
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 
 		consumer.subscribe(Arrays.asList(topicName));
@@ -41,7 +46,7 @@ public class ClickEventConsumeApp {
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(60));
 				log.info("one fetch get size =" + records.count() + "--------------");
 				for (ConsumerRecord<String, String> record : records) {
-					log.info("offset = %d, value = %s", record.offset(), record.value());
+					log.info("offset = " + record.offset() + " value = " + record.value());
 				}
 				log.info("one fetch is finished-----------------------------------");
 			}
