@@ -1,8 +1,7 @@
 package com.sillycat.kafkastream.stream;
 
-import java.util.HashSet;
+import java.time.Duration;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.kafka.common.serialization.Serdes;
@@ -11,15 +10,14 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
-
-import com.alibaba.fastjson.JSON;
-import com.sillycat.kafkastream.model.ClickEvent;
+import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.TimeWindows;
+import org.apache.kafka.streams.kstream.Windowed;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class EventStreamPersistLocalFile {
-
 
 	public static void main(String[] args) {
 		log.info("Start the Kafka connection----------");
@@ -32,19 +30,22 @@ public class EventStreamPersistLocalFile {
 		prop.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
 		StreamsBuilder builder = new StreamsBuilder();
-		KStream<Object, Object> source = builder.stream("events_local_file");
-		
-		Set<ClickEvent> clicks = new HashSet<>();
+		KStream<Object, String> clickStream = builder.stream("events_local_file");
+		final KTable<Windowed<Object>, Long> clickTable = clickStream.groupByKey()
+				.windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofSeconds(5))).count();
+		clickTable.toStream().foreach(null);
 
-		source.foreach((x, y) -> {
-			log.info("x: " + x + "  y: " + y);
-			ClickEvent click = JSON.parseObject(y.toString(), ClickEvent.class);
-			log.info("parse the string to object: " + click.getName() + " " + click.getContent());
-			clicks.add(click);
-		});
-		
-		log.info("gather all the clicks: " + clicks);
-		
+//		Set<ClickEvent> clicks = new HashSet<>();
+//
+//		source.foreach((x, y) -> {
+//			log.info("x: " + x + "  y: " + y);
+//			ClickEvent click = JSON.parseObject(y.toString(), ClickEvent.class);
+//			log.info("parse the string to object: " + click.getName() + " " + click.getContent());
+//			clicks.add(click);
+//		});
+//		
+//		log.info("gather all the clicks: " + clicks);
+
 		final Topology topo = builder.build();
 		final KafkaStreams streams = new KafkaStreams(topo, prop);
 
