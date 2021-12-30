@@ -39,9 +39,11 @@ public class ClickEventConsumeApp {
 		try {
 			while (true) { // always running
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(60));
+				log.info("one fetch get size =" + records.count() + "--------------");
 				for (ConsumerRecord<String, String> record : records) {
 					log.info("offset = %d, value = %s", record.offset(), record.value());
 				}
+				log.info("one fetch is finished-----------------------------------");
 			}
 		} finally {
 			consumer.close();
